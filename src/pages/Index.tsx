@@ -36,8 +36,15 @@ const Index = () => {
             </motion.p>
             <motion.div variants={fadeUp} custom={3} className="flex flex-wrap gap-4">
               <Link to="/subscribe">
-                <Button size="lg" className="gradient-hero text-primary-foreground border-0 h-14 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow">
-                  Start Giving <ArrowRight className="w-5 h-5 ml-2" />
+                <Button size="lg" className="gradient-hero text-primary-foreground border-0 h-14 px-8 text-base font-semibold shadow-lg hover:shadow-xl transition-all relative overflow-hidden group">
+                  <motion.span 
+                    animate={{ x: ["-100%", "200%"] }} 
+                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                    className="absolute inset-0 w-1/2 h-full bg-white/20 -skew-x-12 translate-x-[-100%]"
+                  />
+                  <span className="relative z-10 flex items-center">
+                    Start Giving <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </span>
                 </Button>
               </Link>
               <Link to="/charities">
@@ -143,9 +150,14 @@ const Index = () => {
             <h2 className="text-3xl md:text-5xl font-display font-bold mb-4">Ready to Make Every Swing Count?</h2>
             <p className="text-primary-foreground/80 mb-8 max-w-lg mx-auto">Join GolfGive today. Subscribe from just £9.99/month.</p>
             <Link to="/subscribe">
-              <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-14 px-10 text-base font-semibold">
-                Subscribe Now <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+              <motion.div
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              >
+                <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-14 px-10 text-base font-semibold shadow-xl group">
+                  Subscribe Now <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </motion.div>
             </Link>
           </motion.div>
         </div>
