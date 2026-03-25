@@ -97,8 +97,13 @@ const Dashboard = () => {
   };
 
   const deleteScore = async (id: string) => {
-    await supabase.from("golf_scores").delete().eq("id", id);
-    fetchData();
+    try {
+      const { error } = await supabase.from("golf_scores").delete().eq("id", id);
+      if (error) throw error;
+      await fetchData();
+    } catch (e: any) {
+      toast({ title: "Failed to delete score", description: e.message, variant: "destructive" });
+    }
   };
 
   if (isLoading || loading) {

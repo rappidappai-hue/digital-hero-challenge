@@ -69,10 +69,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setIsAdmin(false);
-    window.location.href = "/";
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.warn("SignOut API failed, continuing flush...", error);
+    } finally {
+      setSession(null);
+      setIsAdmin(false);
+      window.location.href = "/";
+    }
   };
 
   return (
