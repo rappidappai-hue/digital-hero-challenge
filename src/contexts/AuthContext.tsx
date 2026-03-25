@@ -69,15 +69,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.warn("SignOut API failed, continuing flush...", error);
-    } finally {
-      setSession(null);
-      setIsAdmin(false);
-      window.location.href = "/";
-    }
+    // Fire and forget to avoid Promise-queue deadlocks
+    supabase.auth.signOut().catch(e => console.warn(e));
+    
+    // Explicitly detonate the local browser cache to guarantee immediate session wiping
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) localStorage.removeItem(key);
+    });
+    
+    setSession(null);
+    setIsAdmin(false);
+    
+    // Hard jump to homepage
+    window.location.href = "/";
   };
 
   return (
