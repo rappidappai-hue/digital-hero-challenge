@@ -54,7 +54,7 @@ const AdminDashboard = () => {
   const [editFullName, setEditFullName] = useState("");
 
   useEffect(() => {
-    if (!isLoading && (!user || !isAdmin)) navigate("/");
+    if (!isLoading && (!user || !isAdmin)) navigate("/admin/login");
   }, [user, isAdmin, isLoading, navigate]);
 
   useEffect(() => {
