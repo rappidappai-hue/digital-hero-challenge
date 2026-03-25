@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,18 @@ const AdminAuth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAdmin, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (user && isAdmin) {
+        navigate("/admin");
+      } else if (user && !isAdmin) {
+        toast({ title: "Access Denied", description: "You are not an admin.", variant: "destructive" });
+        navigate("/");
+      }
+    }
+  }, [user, isAdmin, isLoading, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
