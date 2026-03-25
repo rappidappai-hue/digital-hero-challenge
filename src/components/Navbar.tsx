@@ -30,12 +30,13 @@ const Navbar = () => {
           </Link>
           {user ? (
             <>
-              <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-                <LayoutDashboard className="w-4 h-4" /> Dashboard
-              </Link>
-              {isAdmin && (
+              {isAdmin ? (
                 <Link to="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
-                  <Shield className="w-4 h-4" /> Admin
+                  <Shield className="w-4 h-4" /> Admin Portal
+                </Link>
+              ) : (
+                <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                  <LayoutDashboard className="w-4 h-4" /> User Dashboard
                 </Link>
               )}
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
@@ -64,8 +65,11 @@ const Navbar = () => {
           <Link to="/charities" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Charities</Link>
           {user ? (
             <>
-              <Link to="/dashboard" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Dashboard</Link>
-              {isAdmin && <Link to="/admin" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Admin</Link>}
+              {isAdmin ? (
+                <Link to="/admin" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Admin Portal</Link>
+              ) : (
+                <Link to="/dashboard" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>User Dashboard</Link>
+              )}
               <button className="text-sm font-medium py-2 text-destructive" onClick={() => { handleSignOut(); setMobileOpen(false); }}>Sign Out</button>
             </>
           ) : (

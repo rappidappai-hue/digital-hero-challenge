@@ -20,7 +20,7 @@ type Winner = Tables<"winners">;
 type Charity = Tables<"charities">;
 
 const Dashboard = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isAdmin, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [scores, setScores] = useState<GolfScore[]>([]);
@@ -32,8 +32,11 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isLoading && !user) navigate("/auth");
-  }, [user, isLoading, navigate]);
+    if (!isLoading) {
+      if (!user) navigate("/");
+      else if (isAdmin) navigate("/admin");
+    }
+  }, [user, isAdmin, isLoading, navigate]);
 
   useEffect(() => {
     if (user) fetchData();
