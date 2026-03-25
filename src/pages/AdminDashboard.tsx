@@ -47,6 +47,10 @@ const AdminDashboard = () => {
   const [charityImageUrl, setCharityImageUrl] = useState("");
   const [editingCharity, setEditingCharity] = useState<Charity | null>(null);
 
+  // User form
+  const [editingUser, setEditingUser] = useState<Profile | null>(null);
+  const [editFullName, setEditFullName] = useState("");
+
   useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) navigate("/");
   }, [user, isAdmin, isLoading, navigate]);
@@ -141,6 +145,14 @@ const AdminDashboard = () => {
   const updateWinnerStatus = async (winnerId: string, status: "verified" | "paid" | "rejected") => {
     await supabase.from("winners").update({ payout_status: status }).eq("id", winnerId);
     toast({ title: `Winner ${status}` });
+    fetchAll();
+  };
+
+  const saveUserProfile = async () => {
+    if (!editingUser) return;
+    await supabase.from("profiles").update({ full_name: editFullName }).eq("id", editingUser.id);
+    toast({ title: "User profile updated" });
+    setEditingUser(null);
     fetchAll();
   };
 
@@ -325,11 +337,41 @@ const AdminDashboard = () => {
                         <p className="font-display font-bold">{p.full_name || "Unnamed User"}</p>
                         <p className="text-sm text-muted-foreground">{p.email}</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={sub?.status === "active" ? "default" : "secondary"}>
-                          {sub?.status ?? "No subscription"}
-                        </Badge>
-                        {sub && <span className="text-sm text-muted-foreground">{sub.plan}</span>}
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <Badge variant={sub?.status === "active" ? "default" : "secondary"}>
+                            {sub?.status ?? "No subscription"}
+                          </Badge>
+                          {sub && <p className="text-xs text-muted-foreground mt-1">{sub.plan}</p>}
+                        </div>
+                        <Dialog open={editingUser?.id === p.id} onOpenChange={(open) => { 
+                          if (open) { setEditingUser(p); setEditFullName(p.full_name || ""); } 
+                          else setEditingUser(null); 
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm"><Edit className="w-3 h-3 mr-1" /> Edit</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit User Profile</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="space-y-2">
+                                <Label>Full Name</Label>
+                                <Input value={editFullName} onChange={(e) => setEditFullName(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Email</Label>
+                                <Input value={p.email || ""} disabled />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button className="w-full" variant="outline">Manage Scores</Button>
+                                <Button className="w-full" variant="outline">Manage Subscription</Button>
+                              </div>
+                              <Button className="w-full gradient-hero text-white border-0" onClick={saveUserProfile}>Save Changes</Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </CardContent>
                   </Card>
