@@ -22,6 +22,7 @@ type Draw = Tables<"draws">;
 type Winner = Tables<"winners">;
 type Charity = Tables<"charities">;
 type Subscription = Tables<"subscriptions">;
+type GolfScore = Tables<"golf_scores">;
 
 const AdminDashboard = () => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -33,6 +34,7 @@ const AdminDashboard = () => {
   const [winners, setWinners] = useState<(Winner & { profiles?: Profile })[]>([]);
   const [charities, setCharities] = useState<Charity[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [scores, setScores] = useState<GolfScore[]>([]);
   const [stats, setStats] = useState({ users: 0, pool: 0, charityTotal: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -60,17 +62,19 @@ const AdminDashboard = () => {
   }, [user, isAdmin]);
 
   const fetchAll = async () => {
-    const [profilesRes, drawsRes, winnersRes, charitiesRes, subsRes] = await Promise.all([
+    const [profilesRes, drawsRes, winnersRes, charitiesRes, subsRes, scoresRes] = await Promise.all([
       supabase.from("profiles").select("*"),
       supabase.from("draws").select("*").order("draw_date", { ascending: false }),
       supabase.from("winners").select("*"),
       supabase.from("charities").select("*").order("created_at", { ascending: false }),
       supabase.from("subscriptions").select("*"),
+      supabase.from("golf_scores").select("*").order("played_date", { ascending: false })
     ]);
     if (profilesRes.data) setProfiles(profilesRes.data);
     if (drawsRes.data) setDraws(drawsRes.data);
     if (winnersRes.data) setWinners(winnersRes.data);
     if (charitiesRes.data) setCharities(charitiesRes.data);
+    if (scoresRes.data) setScores(scoresRes.data);
     if (subsRes.data) {
       setSubscriptions(subsRes.data);
       const activeSubs = subsRes.data.filter(s => s.status === "active");
@@ -153,6 +157,21 @@ const AdminDashboard = () => {
     await supabase.from("profiles").update({ full_name: editFullName }).eq("id", editingUser.id);
     toast({ title: "User profile updated" });
     setEditingUser(null);
+    fetchAll();
+  };
+
+  const deleteScore = async (scoreId: string) => {
+    await supabase.from("golf_scores").delete().eq("id", scoreId);
+    toast({ title: "Score deleted" });
+    fetchAll();
+  };
+
+  const toggleSubscription = async (userId: string) => {
+    const sub = subscriptions.find(s => s.user_id === userId);
+    if (!sub) return;
+    const newStatus = sub.status === "active" ? "cancelled" : "active";
+    await supabase.from("subscriptions").update({ status: newStatus }).eq("id", sub.id);
+    toast({ title: `Subscription marked as ${newStatus}` });
     fetchAll();
   };
 
@@ -364,11 +383,29 @@ const AdminDashboard = () => {
                                 <Label>Email</Label>
                                 <Input value={p.email || ""} disabled />
                               </div>
-                              <div className="flex gap-2">
-                                <Button className="w-full" variant="outline">Manage Scores</Button>
-                                <Button className="w-full" variant="outline">Manage Subscription</Button>
+                              <div className="space-y-2">
+                                <Label>Golf Scores (Last 5)</Label>
+                                {scores.filter(s => s.user_id === p.id).length === 0 ? (
+                                  <p className="text-sm text-muted-foreground">No scores tracked.</p>
+                                ) : (
+                                  <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
+                                    {scores.filter(s => s.user_id === p.id).map(score => (
+                                      <div key={score.id} className="flex justify-between items-center text-sm bg-secondary p-2 rounded">
+                                        <span>{score.score} pts - {score.played_date}</span>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => deleteScore(score.id)}>
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                              <Button className="w-full gradient-hero text-white border-0" onClick={saveUserProfile}>Save Changes</Button>
+                              <div className="pt-2 border-t">
+                                <Button className="w-full" variant="outline" onClick={() => toggleSubscription(p.id)} disabled={!sub}>
+                                  {sub ? (sub.status === "active" ? "Cancel Subscription" : "Re-activate Subscription") : "No Subscription to Manage"}
+                                </Button>
+                              </div>
+                              <Button className="w-full gradient-hero text-white border-0" onClick={saveUserProfile}>Save Name Changes</Button>
                             </div>
                           </DialogContent>
                         </Dialog>
