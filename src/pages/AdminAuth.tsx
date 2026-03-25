@@ -34,27 +34,29 @@ const AdminAuth = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+        }
       } else {
-        // The useEffect will handle navigation to /admin if isAdmin is true
-        // Otherwise, it will show access denied and navigate to /
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName } },
+        });
+        if (error) {
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Success!", description: "Check your email to confirm your account." });
+        }
       }
-    } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName } },
-      });
-      if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Success!", description: "Check your email to confirm your account." });
-      }
+    } catch (err: any) {
+      toast({ title: "Unexpected Error", description: err.message || "An error occurred", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

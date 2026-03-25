@@ -26,8 +26,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAdmin = async (userId: string) => {
-    const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-    setIsAdmin(!!data);
+    try {
+      const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+      if (error) console.error("Admin check error:", error);
+      setIsAdmin(!!data);
+    } catch (e) {
+      console.error("Rpc rejection:", e);
+      setIsAdmin(false);
+    }
   };
 
   useEffect(() => {
@@ -54,12 +60,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       setIsLoading(true);
       setSession(session);
-      if (session?.user) {
-        await checkAdmin(session.user.id);
-      } else {
-        setIsAdmin(false);
+      
+      try {
+        if (session?.user) {
+          await checkAdmin(session.user.id);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (e) {
+        console.error("Auth state handling error:", e);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-      if (mounted) setIsLoading(false);
     });
 
     return () => {
