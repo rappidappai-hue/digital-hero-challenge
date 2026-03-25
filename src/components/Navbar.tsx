@@ -31,11 +31,11 @@ const Navbar = () => {
           {user ? (
             <>
               {isAdmin ? (
-                <Link to="/admin" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <Link to="/admin/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                   <Shield className="w-4 h-4" /> Admin Portal
                 </Link>
               ) : (
-                <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <Link to="/user/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                   <LayoutDashboard className="w-4 h-4" /> User Dashboard
                 </Link>
               )}
@@ -66,9 +66,9 @@ const Navbar = () => {
           {user ? (
             <>
               {isAdmin ? (
-                <Link to="/admin" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Admin Portal</Link>
+                <Link to="/admin/dashboard" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>Admin Portal</Link>
               ) : (
-                <Link to="/dashboard" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>User Dashboard</Link>
+                <Link to="/user/dashboard" className="block text-sm font-medium py-2" onClick={() => setMobileOpen(false)}>User Dashboard</Link>
               )}
               <button className="text-sm font-medium py-2 text-destructive" onClick={() => { handleSignOut(); setMobileOpen(false); }}>Sign Out</button>
             </>

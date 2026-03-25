@@ -66,7 +66,7 @@ const Subscribe = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Subscribed!", description: "Welcome to GolfGive!" });
-      navigate("/dashboard");
+      navigate("/user/dashboard");
     }
     setLoading(false);
   };

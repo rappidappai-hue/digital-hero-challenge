@@ -21,7 +21,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate("/dashboard");
+      navigate("/user/dashboard");
     }
   }, [user, authLoading, navigate]);
 

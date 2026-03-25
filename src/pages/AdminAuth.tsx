@@ -20,7 +20,7 @@ const AdminAuth = () => {
   useEffect(() => {
     if (!isLoading) {
       if (user && isAdmin) {
-        navigate("/admin");
+        navigate("/admin/dashboard");
       } else if (user && !isAdmin) {
         toast({ 
           title: "Access Denied", 

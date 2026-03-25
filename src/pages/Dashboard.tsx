@@ -34,7 +34,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (!isLoading) {
       if (!user) navigate("/");
-      else if (isAdmin) navigate("/admin");
+      else if (isAdmin) navigate("/admin/dashboard");
     }
   }, [user, isAdmin, isLoading, navigate]);
 
