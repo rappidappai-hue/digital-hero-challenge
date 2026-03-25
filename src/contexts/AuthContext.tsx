@@ -58,19 +58,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!mounted) return;
       if (event === 'INITIAL_SESSION') return; 
       
-      setIsLoading(true);
       setSession(session);
       
-      try {
-        if (session?.user) {
-          await checkAdmin(session.user.id);
-        } else {
-          setIsAdmin(false);
+      if (session?.user) {
+        setIsLoading(true);
+        try {
+          // Perform admin check, but don't let it hang the whole app indefinitely
+          // We'll wrap it in a promise that resolves after a timeout just in case
+          const adminPromise = checkAdmin(session.user.id);
+          const timeoutPromise = new Promise(resolve => setTimeout(resolve, 2000));
+          
+          await Promise.race([adminPromise, timeoutPromise]);
+        } catch (e) {
+          console.error("Auth state handling error:", e);
+        } finally {
+          if (mounted) setIsLoading(false);
         }
-      } catch (e) {
-        console.error("Auth state handling error:", e);
-      } finally {
-        if (mounted) setIsLoading(false);
+      } else {
+        setIsAdmin(false);
+        setIsLoading(false);
       }
     });
 
