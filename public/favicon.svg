@@ -1,0 +1,12 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:hsl(250, 84%, 60%);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:hsl(320, 80%, 55%);stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#brand)"/>
+  <path d="M128 184 C80 144 56 116 56 86 C56 62 74 44 98 44 C112 44 122 52 128 64 C134 52 144 44 158 44 C182 44 200 62 200 86 C200 116 176 144 128 184 Z" fill="white" opacity="0.9"/>
+  <!-- Subtle overlay -->
+  <circle cx="128" cy="128" r="100" stroke="white" stroke-width="2" stroke-dasharray="10 10" opacity="0.2" />
+</svg>
