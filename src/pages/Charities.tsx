@@ -120,7 +120,7 @@ const Charities = () => {
                             View Profile <ExternalLink className="w-3 h-3" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl bg-background/95 backdrop-filter blur-xl border-primary/10">
+                        <DialogContent className="max-w-2xl bg-background/95 backdrop-blur-xl border-primary/10">
                           <DialogHeader>
                             <DialogTitle className="text-2xl font-display font-bold flex items-center gap-2">
                               <Heart className="w-6 h-6 text-charity-pink fill-charity-pink" /> {charity.name}
