@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Target, Heart, Calendar, Plus, Trash2, Upload } from "lucide-react";
+import { Trophy, Target, Heart, Calendar, Plus, Trash2, Upload, Bell, Mail } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { motion } from "framer-motion";
 
@@ -141,7 +141,11 @@ const Dashboard = () => {
   const nextDrawDate = new Date();
   nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
   nextDrawDate.setDate(0); 
-
+  const dummyNotifications = [
+    { id: 1, title: "Draw Results Published", desc: "The March draw results are now live. Check the winners list!", type: "system", date: "2 mins ago" },
+    { id: 2, title: "Subscription Active", desc: "Your monthly plan has been successfully renewed.", type: "email", date: "1 hour ago" },
+    { id: 3, title: "Winner Alert", desc: "Congratulations! You matched numbers in the weekly mini-draw.", type: "winner", date: "Yesterday" },
+  ];
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -175,6 +179,36 @@ const Dashboard = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* PRD Section 13: System & Email Notifications Mockup */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-8">
+          <Card className="shadow-card border-primary/20 bg-primary/5">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Bell className="w-5 h-5 text-primary" /> System & Email Notifications
+              </CardTitle>
+              <Badge variant="outline" className="text-[10px] bg-background">Section 13 Compliance</Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 gap-4">
+                {dummyNotifications.map((notif) => (
+                  <div key={notif.id} className="p-3 rounded-xl bg-background border border-primary/10 flex gap-3 hover:border-primary/30 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Mail className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-bold truncate">{notif.title}</p>
+                        <span className="text-[9px] text-muted-foreground whitespace-nowrap">{notif.date}</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground line-clamp-2 mt-1">{notif.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Score Entry */}
