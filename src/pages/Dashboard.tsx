@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 type GolfScore = Tables<"golf_scores">;
 type Subscription = Tables<"subscriptions">;
 type Winner = Tables<"winners">;
+type Charity = Tables<"charities">;
 
 const Dashboard = () => {
   const { user, isLoading } = useAuth();
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [scores, setScores] = useState<GolfScore[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [winners, setWinners] = useState<Winner[]>([]);
+  const [charities, setCharities] = useState<Charity[]>([]);
   const [newScore, setNewScore] = useState("");
   const [newDate, setNewDate] = useState(new Date().toISOString().split("T")[0]);
   const [loading, setLoading] = useState(true);
@@ -39,14 +41,16 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     if (!user) return;
-    const [scoresRes, subRes, winnersRes] = await Promise.all([
+    const [scoresRes, subRes, winnersRes, charitiesRes] = await Promise.all([
       supabase.from("golf_scores").select("*").eq("user_id", user.id).order("played_date", { ascending: false }),
       supabase.from("subscriptions").select("*").eq("user_id", user.id).single(),
       supabase.from("winners").select("*").eq("user_id", user.id),
+      supabase.from("charities").select("*"),
     ]);
     if (scoresRes.data) setScores(scoresRes.data);
     if (subRes.data) setSubscription(subRes.data);
     if (winnersRes.data) setWinners(winnersRes.data);
+    if (charitiesRes.data) setCharities(charitiesRes.data);
     setLoading(false);
   };
 
@@ -103,6 +107,11 @@ const Dashboard = () => {
   }
 
   const totalWinnings = winners.reduce((sum, w) => sum + w.prize_amount, 0);
+  
+  // Calculate upcoming draw (end of current month)
+  const nextDrawDate = new Date();
+  nextDrawDate.setMonth(nextDrawDate.getMonth() + 1);
+  nextDrawDate.setDate(0); 
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,10 +123,10 @@ const Dashboard = () => {
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           {[
-            { icon: Target, label: "Subscription", value: subscription?.status === "active" ? "Active" : "Inactive", color: subscription?.status === "active" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive" },
-            { icon: Trophy, label: "Total Winnings", value: `£${totalWinnings.toFixed(2)}`, color: "bg-gold/10 text-gold" },
-            { icon: Heart, label: "Charity %", value: `${subscription?.charity_percentage ?? 10}%`, color: "bg-charity-pink/10 text-charity-pink" },
-            { icon: Calendar, label: "Scores Entered", value: `${scores.length}/5`, color: "bg-primary/10 text-primary" },
+            { icon: Target, label: "Subscription", value: subscription?.status === "active" ? "Active" : "Inactive", desc: subscription?.renewal_date ? `Renews: ${new Date(subscription.renewal_date).toLocaleDateString()}` : "No active plan", color: subscription?.status === "active" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive" },
+            { icon: Trophy, label: "Total Winnings", value: `£${totalWinnings.toFixed(2)}`, desc: `${winners.length} draws won`, color: "bg-gold/10 text-gold" },
+            { icon: Heart, label: "Charity Contribution", value: `${subscription?.charity_percentage ?? 10}%`, desc: "Supporting GolfGive Charities", color: "bg-charity-pink/10 text-charity-pink" },
+            { icon: Calendar, label: "Upcoming Draw", value: "Entered", desc: nextDrawDate.toLocaleDateString(), color: "bg-primary/10 text-primary" },
           ].map((stat, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
               <Card className="shadow-card">
@@ -129,6 +138,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm text-muted-foreground">{stat.label}</p>
                       <p className="text-lg font-display font-bold">{stat.value}</p>
+                      <p className="text-xs text-muted-foreground">{stat.desc}</p>
                     </div>
                   </div>
                 </CardContent>
