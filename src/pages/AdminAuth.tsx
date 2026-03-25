@@ -30,16 +30,6 @@ const AdminAuth = () => {
     }
   }, [user, isAdmin, isLoading, navigate, toast]);
 
-  const handleAdminDemoSignIn = async () => {
-    setLoading(true);
-    // Uses the admin credentials already promoted in the database
-    const { error } = await supabase.auth.signInWithPassword({ email: "admin@digitalheroes.co.in", password: "admin123" });
-    if (error) {
-      toast({ title: "Admin Promotion Required", description: "Ensure this email is switched to 'admin' in Supabase user_roles.", variant: "destructive" });
-    }
-    setLoading(false);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -103,13 +93,6 @@ const AdminAuth = () => {
             <button type="button" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
-          </div>
-          <div className="mt-6 border-t pt-4">
-            <Button type="button" variant="outline" className="w-full relative shadow-sm border-primary/20 text-primary hover:bg-primary/10" onClick={handleAdminDemoSignIn} disabled={loading}>
-              <div className="absolute left-4 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-              1-Click Administrator Auto-Login
-            </Button>
-            <p className="text-xs text-center text-muted-foreground mt-2">Instantly access the secure Admin Portal.</p>
           </div>
         </CardContent>
       </Card>

@@ -17,21 +17,6 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleDemoSignIn = async () => {
-    setLoading(true);
-    const demoEmail = "recruiter@digitalheroes.co.in";
-    const demoPass = "evaluator123";
-    
-    // Attempt login first
-    const { error } = await supabase.auth.signInWithPassword({ email: demoEmail, password: demoPass });
-    if (error && error.message.includes("Invalid login credentials")) {
-      // Auto-create for the recruiter if it doesn't exist
-      await supabase.auth.signUp({ email: demoEmail, password: demoPass, options: { data: { full_name: "Senior Recruiter" } } });
-      await supabase.auth.signInWithPassword({ email: demoEmail, password: demoPass });
-    }
-    setLoading(false);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -92,13 +77,6 @@ const Auth = () => {
             <button type="button" className="text-sm text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsLogin(!isLogin)}>
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
-          </div>
-          <div className="mt-6 border-t pt-4">
-            <Button type="button" variant="outline" className="w-full relative shadow-sm border-primary/20 text-primary hover:bg-primary/10" onClick={handleDemoSignIn} disabled={loading}>
-              <div className="absolute left-4 w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              1-Click Recruiter Demo Login
-            </Button>
-            <p className="text-xs text-center text-muted-foreground mt-2">Instantly access the User Dashboard for review.</p>
           </div>
         </CardContent>
       </Card>
