@@ -113,3 +113,42 @@
     box-shadow: var(--shadow-elevated);
   }
 }
+
+@layer components {
+  /* PRD 12: Emotion-driven micro-interactions and animations */
+  .gradient-hero {
+    background: var(--gradient-hero);
+    background-size: 200% auto;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .gradient-hero:hover:not(:disabled) {
+    background-position: right center;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 24px -8px hsl(250 84% 60% / 0.5);
+  }
+
+  .gradient-hero:active:not(:disabled) {
+    transform: translateY(0px) scale(0.98);
+  }
+
+  /* Universal card hover physics */
+  .shadow-card, .shadow-elevated {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .shadow-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -4px hsl(220 25% 10% / 0.12);
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
