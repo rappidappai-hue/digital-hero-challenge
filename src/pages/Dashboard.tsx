@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Target, Heart, Calendar, Plus, Trash2 } from "lucide-react";
+import { Trophy, Target, Heart, Calendar, Plus, Trash2, Upload } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { motion } from "framer-motion";
 
@@ -104,6 +104,27 @@ const Dashboard = () => {
     } catch (e: any) {
       toast({ title: "Failed to delete score", description: e.message, variant: "destructive" });
     }
+  };
+
+  const handleUploadProof = async (winnerId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      try {
+        const { error } = await supabase.from("winners").update({ proof_url: base64String }).eq("id", winnerId);
+        if (error) throw error;
+        toast({ title: "Proof uploaded successfully!" });
+        await fetchData();
+      } catch (err: any) {
+        toast({ title: "Upload failed", description: err.message, variant: "destructive" });
+        setLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (isLoading || loading) {
@@ -225,9 +246,25 @@ const Dashboard = () => {
                           {w.match_count}-Match
                         </Badge>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col items-end gap-2">
                         <p className="font-display font-bold">£{w.prize_amount.toFixed(2)}</p>
                         <Badge variant="outline" className="text-xs">{w.payout_status}</Badge>
+                        {w.payout_status === "pending" && !w.proof_url && (
+                          <div className="relative overflow-hidden inline-block mt-1">
+                            <Button size="sm" variant="secondary" className="h-7 text-xs border border-primary/20 hover:bg-primary/10">
+                              <Upload className="w-3 h-3 mr-1" /> Upload Proof
+                            </Button>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="absolute top-0 left-0 opacity-0 cursor-pointer h-full w-full" 
+                              onChange={(e) => handleUploadProof(w.id, e)} 
+                            />
+                          </div>
+                        )}
+                        {w.proof_url && (
+                          <span className="text-xs text-primary font-medium">Proof submitted</span>
+                        )}
                       </div>
                     </div>
                   ))}

@@ -99,19 +99,27 @@ const AdminDashboard = () => {
     const activeSubs = subscriptions.filter(s => s.status === "active");
     const poolTotal = activeSubs.reduce((sum, s) => sum + s.amount * (1 - s.charity_percentage / 100), 0);
 
+    let rolloverBonus = 0;
+    const { data: lastDraw } = await supabase.from("draws").select("rollover_amount").order("draw_date", { ascending: false }).limit(1).maybeSingle();
+    if (lastDraw && lastDraw.rollover_amount) {
+      rolloverBonus = lastDraw.rollover_amount;
+    }
+    
+    const finalPool = poolTotal + rolloverBonus;
+
     const { data: insertedDraw, error } = await supabase.from("draws").insert({
       draw_date: drawDate,
       logic_type: drawLogic,
       winning_numbers: nums,
-      prize_pool_total: poolTotal,
+      prize_pool_total: finalPool,
       status: "simulated",
     }).select().single();
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else if (insertedDraw) {
-      // Execute the draw logic correctly here
-      await executeDraw(insertedDraw.id, nums, poolTotal);
+      // Execute the draw distribution logic algorithm
+      await executeDraw(insertedDraw.id, nums, finalPool);
       toast({ title: "Draw created and simulated!" }); 
       fetchAll(); 
     }
